@@ -1,5 +1,5 @@
 from altools.fastq_parser import read_fastq
-from altools.fastq import FASTQRead
+from altools.dna_sequence import NamedDNASequence
 from altools.nucleotide import Nucleotide
 
 
@@ -7,7 +7,7 @@ def test_read_fastq_one_read(tmp_path):
     (tmp_path / "sample.fastq").write_text("@read_name\n" "GATTACA\n" "+\n" "FFFFFFF")
 
     expected = (
-        FASTQRead(
+        NamedDNASequence(
             "@read_name",
             (
                 Nucleotide.G,
@@ -37,7 +37,7 @@ def test_read_fastq_two_reads(tmp_path):
     )
 
     expected = (
-        FASTQRead(
+        NamedDNASequence(
             "@read_name",
             (
                 Nucleotide.G,
@@ -49,7 +49,7 @@ def test_read_fastq_two_reads(tmp_path):
                 Nucleotide.A,
             ),
         ),
-        FASTQRead(
+        NamedDNASequence(
             "@read2_name",
             (
                 Nucleotide.G,

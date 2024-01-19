@@ -1,5 +1,5 @@
 from typing import Optional
-from altools.fastq import FASTQRead
+from altools.dna_sequence import NamedDNASequence
 from altools.nucleotide import Nucleotide, str_to_nucleotide
 
 class FastQParserState:
@@ -26,7 +26,7 @@ class Separator(DNA):
 
     def next(self, _: str):
         if self.name is not None and self.dna is not None:
-            fastq_read = FASTQRead(self.name, self.dna)
+            fastq_read = NamedDNASequence(self.name, self.dna)
         else:
             fastq_read = None
         return Quality(self.name, self.dna), fastq_read
@@ -38,7 +38,7 @@ class Quality(Separator):
     def next(self, line: str):
         return Header(line.strip()), None
 
-def read_fastq(fastq_path) -> tuple[FASTQRead]:
+def read_fastq(fastq_path) -> tuple[NamedDNASequence]:
     """Reads in a FASTQ file"""
 
     state = Quality(None, None)
