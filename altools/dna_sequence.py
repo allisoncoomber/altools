@@ -1,11 +1,10 @@
-from enum import Enum, auto
-from typing import Optional
+from typing import Iterable
 
 from altools.nucleotide import str_to_nucleotide, Nucleotide
 
 class DNASequence:
-    def __init__(self, dna: tuple[Nucleotide]):
-        self.dna = dna
+    def __init__(self, dna: Iterable[Nucleotide]):
+        self.dna = tuple(dna)
 
     def __eq__(self, other: "DNASequence"):
         return self.dna == other.dna
@@ -15,6 +14,9 @@ class DNASequence:
     
     def __len__(self) -> int:
         return len(self.dna)
+    
+    def __str__(self) -> str:
+        return "".join([nuc.value for nuc in self.dna])
 
     @classmethod
     def from_string(cls, dna: str):
