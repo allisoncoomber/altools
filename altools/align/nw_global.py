@@ -12,7 +12,7 @@ def global_align_nw(
     mismatch_penalty: int = -2,
     gap_penalty: int = -1,
 ) -> list[Alignment]:
-    mat = np.zeros(((len(seq_a) + 1, len(seq_b) + 1)), dtype=int)
+    mat = np.zeros(((len(seq_b) + 1, len(seq_a) + 1)), dtype=int)
     mat[0, :] = [-1 * i for i in range(0, len(seq_a) + 1)]  # seq_a goes along the top
     mat[:, 0] = [-1 * i for i in range(0, len(seq_b) + 1)]  # seq_b goes down the rows
 
