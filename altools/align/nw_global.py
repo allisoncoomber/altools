@@ -1,17 +1,17 @@
-from altools.align.alignment import GlobalAlignment
+from altools.align.alignment import Alignment
 from altools.dna_sequence import DNASequence
 from altools.nucleotide import Nucleotide
 
 import numpy as np
 
 
-def align_nw(
+def global_align_nw(
     seq_a: DNASequence,
     seq_b: DNASequence,
     match_reward: int = 1,
     mismatch_penalty: int = -2,
     gap_penalty: int = -1,
-) -> list[GlobalAlignment]:
+) -> list[Alignment]:
     mat = np.zeros(((len(seq_a) + 1, len(seq_b) + 1)), dtype=int)
     mat[0, :] = [-1 * i for i in range(0, len(seq_a) + 1)]  # seq_a goes along the top
     mat[:, 0] = [-1 * i for i in range(0, len(seq_b) + 1)]  # seq_b goes down the rows
@@ -75,7 +75,7 @@ def get_paths(
 
 def get_alignments_from_paths(
     paths: list[list[tuple[int, int]]], seq_a: DNASequence, seq_b: DNASequence
-) -> list[GlobalAlignment]:
+) -> list[Alignment]:
     # start at the first tuple in the path
     # this corresponds to the index+1 of the sequences
     # where i is the seq_b and j is seq_a
@@ -110,6 +110,6 @@ def get_alignments_from_paths(
                 aligned_a.append(Nucleotide.GAP)
                 aligned_b.append(seq_b[i_current - 1])
         alignments.append(
-            GlobalAlignment(DNASequence(aligned_a), DNASequence(aligned_b))
+            Alignment(DNASequence(aligned_a), DNASequence(aligned_b))
         )
     return alignments

@@ -1,3 +1,3 @@
-__all__ = ["align_nw"]
+__all__ = ["global_align_nw"]
 
-from .nw_global import align_nw
+from .nw_global import global_align_nw
