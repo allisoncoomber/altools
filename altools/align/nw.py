@@ -4,6 +4,7 @@ from altools.nucleotide import Nucleotide
 
 import numpy as np
 
+
 def align_nw(
     seq_a: DNASequence,
     seq_b: DNASequence,
@@ -50,7 +51,7 @@ def pos_from_traceback(
     """
     Computes a new position (or sequence of positions) from a traceback dictionary and a position
     """
-    direction_mapping = {0: [-1,0], 1: [0, -1], 2: [-1, -1]}
+    direction_mapping = {0: [-1, 0], 1: [0, -1], 2: [-1, -1]}
     positions = []
     for direction_indicator in traceback[position]:
         direction = direction_mapping[direction_indicator]
@@ -58,8 +59,11 @@ def pos_from_traceback(
         positions.append(new_position)
     return positions
 
-def get_paths(traceback: dict[tuple[int, int], np.ndarray], position: tuple[int, int]) -> list[list[tuple[int, int]]]:
-    if position == (0,0):
+
+def get_paths(
+    traceback: dict[tuple[int, int], np.ndarray], position: tuple[int, int]
+) -> list[list[tuple[int, int]]]:
+    if position == (0, 0):
         return [[]]
     result = []
     for next_path_position in pos_from_traceback(traceback, position):
@@ -68,7 +72,10 @@ def get_paths(traceback: dict[tuple[int, int], np.ndarray], position: tuple[int,
             result.append(sub_path + [position])
     return result
 
-def get_alignments_from_paths(paths: list[list[tuple[int, int]]], seq_a: DNASequence, seq_b: DNASequence) -> list[GlobalAlignment]:
+
+def get_alignments_from_paths(
+    paths: list[list[tuple[int, int]]], seq_a: DNASequence, seq_b: DNASequence
+) -> list[GlobalAlignment]:
     # start at the first tuple in the path
     # this corresponds to the index+1 of the sequences
     # where i is the seq_b and j is seq_a
@@ -77,7 +84,7 @@ def get_alignments_from_paths(paths: list[list[tuple[int, int]]], seq_a: DNASequ
     # if there is a left gap, then seq_b has a gap
     # if there is top gap, then seq_a has a gap
     # okay this is three branches, is there a way to make it less branch-y
-    # i think yes if instead of making "three cases" we just have one situation 
+    # i think yes if instead of making "three cases" we just have one situation
     # where we compare to the previous value each time?
     alignments = []
     for path in paths:
@@ -88,30 +95,21 @@ def get_alignments_from_paths(paths: list[list[tuple[int, int]]], seq_a: DNASequ
             if idx == 0:
                 difference_in_position = (i_current, j_current)
             else:
-                i_previous, j_previous = path[idx-1]
-                difference_in_position = (i_current - i_previous, j_current - j_previous)
-            if difference_in_position == (1,1):
-                aligned_a.append(seq_a[j_current-1])
-                aligned_b.append(seq_b[i_current-1])
-            elif difference_in_position == (0,1):
-                aligned_a.append(seq_a[j_current-1])
-                aligned_b.append(Nucleotide.GAP)  
-            elif difference_in_position == (1,0):
+                i_previous, j_previous = path[idx - 1]
+                difference_in_position = (
+                    i_current - i_previous,
+                    j_current - j_previous,
+                )
+            if difference_in_position == (1, 1):
+                aligned_a.append(seq_a[j_current - 1])
+                aligned_b.append(seq_b[i_current - 1])
+            elif difference_in_position == (0, 1):
+                aligned_a.append(seq_a[j_current - 1])
+                aligned_b.append(Nucleotide.GAP)
+            elif difference_in_position == (1, 0):
                 aligned_a.append(Nucleotide.GAP)
-                aligned_b.append(seq_b[i_current-1])
-        alignments.append(GlobalAlignment(DNASequence(aligned_a), DNASequence(aligned_b)))
-    return alignments             
-            
-            
-
-
-if __name__ == "__main__":
-    alignments = align_nw(
-        DNASequence.from_string("GCATGCG"),
-        DNASequence.from_string("GATTACA"),
-        match_reward=1,
-        mismatch_penalty=-1,
-        gap_penalty=-1,
-    )
-    for alignment in alignments:
-        print(alignment)
+                aligned_b.append(seq_b[i_current - 1])
+        alignments.append(
+            GlobalAlignment(DNASequence(aligned_a), DNASequence(aligned_b))
+        )
+    return alignments
