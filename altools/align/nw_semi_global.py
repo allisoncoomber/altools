@@ -12,9 +12,9 @@ def semi_global_align_nw(
     mismatch_penalty: int = -2,
     gap_penalty: int = -1,
 ) -> list[Alignment]:
-    mat = np.zeros(((len(seq_a) + 1, len(seq_b) + 1)), dtype=int)
-    mat[0, :] = [-1 * i for i in range(0, len(seq_a) + 1)]  # seq_a goes along the top
-    mat[:, 0] = [-1 * i for i in range(0, len(seq_b) + 1)]  # seq_b goes down the rows
+    # seq_a goes along the top
+    # seq_b goes down the rows
+    mat = np.zeros(((len(seq_b) + 1, len(seq_a) + 1)), dtype=int)
 
     traceback = {(0, 0): np.array([])}
     for j in range(1, len(seq_a) + 1):
@@ -39,9 +39,21 @@ def semi_global_align_nw(
             max_indices = np.where(np.max(scores) == scores)[0]
             traceback[(i, j)] = max_indices
 
-    traceback_pos = (len(seq_b), len(seq_a))
+    # traceback_pos = (len(seq_b), len(seq_a))
+    best_edge_score = max(mat[-1, :].max(), mat[:, -1].max())
+    bottom_row_best_edge_indices = np.where(mat[-1, :] == best_edge_score)[0]
+    right_column_best_edge_indices = np.where(mat[:, -1] == best_edge_score)[0]
+    traceback_positions = []
+    for j in bottom_row_best_edge_indices:
+        traceback_positions.append((len(seq_b), j))
+    for i in right_column_best_edge_indices:
+        traceback_positions.append((i, len(seq_a)))
+    traceback_positions = list(set(traceback_positions))  # de-duplicate
 
-    paths = get_paths(traceback, traceback_pos)
+    paths = []
+    for traceback_pos in traceback_positions:
+        paths.extend(get_paths(traceback, traceback_pos))
+
     return get_alignments_from_paths(paths, seq_a, seq_b)
 
 
@@ -108,8 +120,25 @@ def get_alignments_from_paths(
                 aligned_b.append(Nucleotide.GAP)
             elif difference_in_position == (1, 0):
                 aligned_a.append(Nucleotide.GAP)
-                aligned_b.append(seq_b[i_current - 1])
-        alignments.append(
-            Alignment(DNASequence(aligned_a), DNASequence(aligned_b))
-        )
+                aligned_b.append(seq_b[i_current - 1])            
+       
+        if i_current == (len(seq_b)) and j_current != (len(seq_a)): # we are at the bottom but not the rightmost corner
+            aligned_a.extend(seq_a[j_current:])
+            aligned_b.extend([Nucleotide.GAP] * len(seq_a[j_current:]))
+        else:
+            # we are on the right side but not the bottom
+            aligned_a.extend([Nucleotide.GAP] * len(seq_b[i_current:]))
+            aligned_b.extend(seq_b[i_current:])
+
+        alignments.append(Alignment(DNASequence(aligned_a), DNASequence(aligned_b)))
+
+                
     return alignments
+
+
+if __name__ == "__main__":
+    alignments = semi_global_align_nw(
+        DNASequence.from_string("GGGATAGGG"), DNASequence.from_string("ATA")
+    )
+    for a in alignments:
+        print(a)
