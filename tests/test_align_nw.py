@@ -1,5 +1,5 @@
 from altools.align.alignment import GlobalAlignment
-from altools.align.nw import align_nw
+from altools.align import align_nw
 from altools.dna_sequence import DNASequence
 
 
