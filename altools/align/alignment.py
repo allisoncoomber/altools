@@ -7,3 +7,6 @@ class GlobalAlignment:
 
     def __str__(self):
         return str(self.seq_a) + "\n" + str(self.seq_b) + "\n"
+    
+    def __eq__(self, other: "GlobalAlignment"):
+        return self.seq_a == other.seq_a and self.seq_b == other.seq_b
