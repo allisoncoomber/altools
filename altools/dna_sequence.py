@@ -7,7 +7,10 @@ class DNASequence:
         self.dna = tuple(dna)
 
     def __eq__(self, other: "DNASequence"):
-        return self.dna == other.dna
+        if isinstance(other, self.__class__):
+            return self.dna == other.dna
+        else:
+            return False
     
     def __getitem__(self, key: int) -> Nucleotide: 
         return self.dna[key]
